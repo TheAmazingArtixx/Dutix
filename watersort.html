@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Sort - GameZone</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .game-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        .header h1 {
+            color: #667eea;
+            font-size: 2rem;
+        }
+        .header-right {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .score-box {
+            background: #667eea;
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            font-size: 1rem;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .game-board {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .tubes-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 2rem;
+            justify-items: center;
+            margin-bottom: 2rem;
+        }
+        .tube {
+            width: 80px;
+            height: 200px;
+            border: 4px solid #333;
+            border-top: none;
+            border-radius: 0 0 15px 15px;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column-reverse;
+            padding: 5px;
+            gap: 3px;
+        }
+        .tube:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .tube.selected {
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        .water-layer {
+            width: 100%;
+            height: 45px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        .controls {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        .win-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+            text-align: center;
+            display: none;
+            z-index: 1000;
+        }
+        .win-message.show {
+            display: block;
+        }
+        .win-message h2 {
+            color: #667eea;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .win-message p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            color: #666;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 999;
+        }
+        .overlay.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>🧪 Water Sort</h1>
+            <div class="header-right">
+                <div class="score-box">Coups: <span id="moves">0</span></div>
+                <div class="score-box">Score: <span id="score">0</span></div>
+                <button class="btn btn-secondary" onclick="window.location.href='games.html'">Retour</button>
+            </div>
+        </div>
+
+        <div class="game-board">
+            <div class="tubes-container" id="tubesContainer"></div>
+            <div class="controls">
+                <button class="btn btn-primary" onclick="resetGame()">🔄 Nouvelle partie</button>
+                <button class="btn btn-secondary" onclick="undoMove()">↶ Annuler</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="win-message" id="winMessage">
+        <h2>🎉 Bravo !</h2>
+        <p>Tu as terminé en <span id="finalMoves"></span> coups !</p>
+        <p>+<span id="pointsEarned"></span> points gagnés</p>
+        <button class="btn btn-primary" onclick="resetGame()">Rejouer</button>
+        <button class="btn btn-secondary" onclick="window.location.href='games.html'">Menu</button>
+    </div>
+
+    <script>
+        let tubes = [];
+        let selectedTube = null;
+        let moves = 0;
+        let score = 0;
+        let history = [];
+        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8'];
+
+        function initGame() {
+            tubes = [];
+            moves = 0;
+            score = 0;
+            history = [];
+            selectedTube = null;
+            
+            // Créer 7 tubes (5 avec couleurs, 2 vides)
+            for (let i = 0; i < 7; i++) {
+                tubes.push([]);
+            }
+            
+            // Remplir avec couleurs mélangées
+            let allColors = [];
+            colors.forEach(color => {
+                for (let i = 0; i < 4; i++) {
+                    allColors.push(color);
+                }
+            });
+            
+            // Mélanger
+            allColors.sort(() => Math.random() - 0.5);
+            
+            // Distribuer dans les 5 premiers tubes
+            for (let i = 0; i < 5; i++) {
+                for (let j = 0; j < 4; j++) {
+                    tubes[i].push(allColors[i * 4 + j]);
+                }
+            }
+            
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            document.getElementById('moves').textContent = moves;
+            document.getElementById('score').textContent = score;
+            
+            const container = document.getElementById('tubesContainer');
+            container.innerHTML = '';
+            
+            tubes.forEach((tube, index) => {
+                const tubeEl = document.createElement('div');
+                tubeEl.className = 'tube';
+                if (selectedTube === index) {
+                    tubeEl.classList.add('selected');
+                }
+                tubeEl.onclick = () => selectTube(index);
+                
+                tube.forEach(color => {
+                    const layer = document.createElement('div');
+                    layer.className = 'water-layer';
+                    layer.style.backgroundColor = color;
+                    tubeEl.appendChild(layer);
+                });
+                
+                container.appendChild(tubeEl);
+            });
+        }
+
+        function selectTube(index) {
+            if (selectedTube === null) {
+                if (tubes[index].length > 0) {
+                    selectedTube = index;
+                    updateDisplay();
+                }
+            } else {
+                if (selectedTube === index) {
+                    selectedTube = null;
+                    updateDisplay();
+                } else {
+                    pourWater(selectedTube, index);
+                }
+            }
+        }
+
+        function pourWater(from, to) {
+            const fromTube = tubes[from];
+            const toTube = tubes[to];
+            
+            if (fromTube.length === 0) {
+                selectedTube = null;
+                updateDisplay();
+                return;
+            }
+            
+            if (toTube.length >= 4) {
+                selectedTube = null;
+                updateDisplay();
+                return;
+            }
+            
+            const topColor = fromTube[fromTube.length - 1];
+            
+            if (toTube.length > 0 && toTube[toTube.length - 1] !== topColor) {
+                selectedTube = null;
+                updateDisplay();
+                return;
+            }
+            
+            // Sauvegarder pour undo
+            history.push(JSON.parse(JSON.stringify(tubes)));
+            
+            // Verser autant que possible
+            while (fromTube.length > 0 && 
+                   toTube.length < 4 && 
+                   fromTube[fromTube.length - 1] === topColor &&
+                   (toTube.length === 0 || toTube[toTube.length - 1] === topColor)) {
+                toTube.push(fromTube.pop());
+            }
+            
+            moves++;
+            score += 10;
+            selectedTube = null;
+            
+            updateDisplay();
+            checkWin();
+        }
+
+        function undoMove() {
+            if (history.length > 0) {
+                tubes = history.pop();
+                moves = Math.max(0, moves - 1);
+                score = Math.max(0, score - 10);
+                selectedTube = null;
+                updateDisplay();
+            }
+        }
+
+        function checkWin() {
+            let completed = 0;
+            
+            for (let tube of tubes) {
+                if (tube.length === 4) {
+                    const firstColor = tube[0];
+                    if (tube.every(c => c === firstColor)) {
+                        completed++;
+                    }
+                } else if (tube.length === 0) {
+                    // Tube vide ok
+                } else {
+                    return; // Pas gagné
+                }
+            }
+            
+            if (completed === 5) {
+                showWinMessage();
+            }
+        }
+
+        function showWinMessage() {
+            const pointsEarned = Math.max(100, 500 - moves * 5);
+            document.getElementById('finalMoves').textContent = moves;
+            document.getElementById('pointsEarned').textContent = pointsEarned;
+            document.getElementById('overlay').classList.add('show');
+            document.getElementById('winMessage').classList.add('show');
+            
+            // Mettre à jour la progression
+            updateProgress('watersort', pointsEarned);
+        }
+
+        function resetGame() {
+            document.getElementById('overlay').classList.remove('show');
+            document.getElementById('winMessage').classList.remove('show');
+            initGame();
+        }
+
+        function updateProgress(gameId, points) {
+            const user = JSON.parse(localStorage.getItem('gameZoneUser'));
+            if (!user) return;
+            
+            user.points = (user.points || 0) + points;
+            user.level = Math.floor(user.points / 1000) + 1;
+            
+            if (!user.gamesPlayed) user.gamesPlayed = {};
+            if (!user.gamesPlayed[gameId]) {
+                user.gamesPlayed[gameId] = { played: 0, best: 0 };
+            }
+            
+            user.gamesPlayed[gameId].played++;
+            user.gamesPlayed[gameId].best = Math.max(user.gamesPlayed[gameId].best, points);
+            
+            localStorage.setItem('gameZoneUser', JSON.stringify(user));
+            
+            // Mettre à jour dans la liste des utilisateurs
+            const users = JSON.parse(localStorage.getItem('gameZoneUsers') || '[]');
+            const userIndex = users.findIndex(u => u.id === user.id);
+            if (userIndex !== -1) {
+                users[userIndex] = user;
+                localStorage.setItem('gameZoneUsers', JSON.stringify(users));
+            }
+        }
+
+        // Vérifier connexion
+        const user = JSON.parse(localStorage.getItem('gameZoneUser'));
+        if (!user) {
+            alert('Connecte-toi d\'abord !');
+            window.location.href = 'login.html';
+        } else {
+            initGame();
+        }
+    </script>
+</body>
+</html>
