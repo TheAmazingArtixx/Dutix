@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameZone - Connexion</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+        .auth-container {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .auth-header h1 {
+            color: #667eea;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .auth-header p {
+            color: #666;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .captcha-container {
+            margin-bottom: 1.5rem;
+        }
+        .captcha-canvas {
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+        }
+        .captcha-input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .captcha-input-group input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+        .refresh-btn {
+            padding: 0.8rem 1.5rem;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: background 0.3s;
+        }
+        .refresh-btn:hover {
+            background: #e0e0e0;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+        }
+        .toggle-mode {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+        .toggle-mode button {
+            background: none;
+            border: none;
+            color: #667eea;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            text-decoration: underline;
+        }
+        .back-link {
+            text-align: center;
+            margin-top: 1rem;
+        }
+        .back-link a {
+            color: #666;
+            text-decoration: none;
+        }
+        .back-link a:hover {
+            color: #667eea;
+        }
+        .password-container {
+            position: relative;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <h1 id="authTitle">🔐 Connexion</h1>
+            <p>Accède à tes jeux préférés</p>
+        </div>
+
+        <form id="authForm">
+            <div class="form-group">
+                <label for="username">Nom d'utilisateur</label>
+                <input type="text" id="username" required minlength="3" placeholder="Ton pseudo">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <div class="password-container">
+                    <input type="password" id="password" required minlength="6" placeholder="Ton mot de passe">
+                    <button type="button" class="toggle-password" onclick="togglePassword()">👁️</button>
+                </div>
+            </div>
+
+            <div id="captchaSection" class="captcha-container" style="display: none;">
+                <label>Vérification Captcha</label>
+                <canvas id="captchaCanvas" class="captcha-canvas" width="300" height="100" onclick="generateCaptcha()"></canvas>
+                <div class="captcha-input-group">
+                    <input type="text" id="captchaInput" placeholder="Entre le code" maxlength="6">
+                    <button type="button" class="refresh-btn" onclick="generateCaptcha()">↻</button>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">Se connecter</button>
+        </form>
+
+        <div class="toggle-mode">
+            <button onclick="toggleMode()" id="toggleBtn">Pas de compte ? S'inscrire</button>
+        </div>
+
+        <div class="back-link">
+            <a href="index.html">← Retour à l'accueil</a>
+        </div>
+    </div>
+
+    <script>
+        let isLoginMode = true;
+        let captchaText = '';
+        const SUPABASE_URL = 'TON_SUPABASE_URL'; // À remplacer
+        const SUPABASE_KEY = 'TON_SUPABASE_KEY'; // À remplacer
+
+        function toggleMode() {
+            isLoginMode = !isLoginMode;
+            document.getElementById('authTitle').textContent = isLoginMode ? '🔐 Connexion' : '📝 Inscription';
+            document.getElementById('submitBtn').textContent = isLoginMode ? 'Se connecter' : "S'inscrire";
+            document.getElementById('toggleBtn').textContent = isLoginMode ? "Pas de compte ? S'inscrire" : 'Déjà un compte ? Se connecter';
+            document.getElementById('captchaSection').style.display = isLoginMode ? 'none' : 'block';
+            
+            if (!isLoginMode) {
+                generateCaptcha();
+            }
+        }
+
+        function togglePassword() {
+            const passInput = document.getElementById('password');
+            passInput.type = passInput.type === 'password' ? 'text' : 'password';
+        }
+
+        function generateCaptcha() {
+            const canvas = document.getElementById('captchaCanvas');
+            const ctx = canvas.getContext('2d');
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            
+            captchaText = '';
+            for (let i = 0; i < 6; i++) {
+                captchaText += chars[Math.floor(Math.random() * chars.length)];
+            }
+            
+            ctx.fillStyle = '#f3f4f6';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.font = 'bold 40px Arial';
+            ctx.fillStyle = '#667eea';
+            ctx.textBaseline = 'middle';
+            
+            for (let i = 0; i < captchaText.length; i++) {
+                ctx.save();
+                ctx.translate(30 + i * 40, 50);
+                ctx.rotate((Math.random() - 0.5) * 0.4);
+                ctx.fillText(captchaText[i], 0, 0);
+                ctx.restore();
+            }
+            
+            for (let i = 0; i < 5; i++) {
+                ctx.strokeStyle = '#9ca3af';
+                ctx.beginPath();
+                ctx.moveTo(Math.random() * 300, Math.random() * 100);
+                ctx.lineTo(Math.random() * 300, Math.random() * 100);
+                ctx.stroke();
+            }
+            
+            document.getElementById('captchaInput').value = '';
+        }
+
+        document.getElementById('authForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (!isLoginMode) {
+                const captchaInput = document.getElementById('captchaInput').value.toUpperCase();
+                if (captchaInput !== captchaText) {
+                    alert('Captcha incorrect ! Réessaie.');
+                    generateCaptcha();
+                    return;
+                }
+            }
+            
+            // Simuler Supabase avec localStorage
+            const users = JSON.parse(localStorage.getItem('gameZoneUsers') || '[]');
+            
+            if (isLoginMode) {
+                const user = users.find(u => u.username === username && u.password === password);
+                if (user) {
+                    localStorage.setItem('gameZoneUser', JSON.stringify(user));
+                    alert('Connexion réussie !');
+                    window.location.href = 'games.html';
+                } else {
+                    alert('Identifiants incorrects !');
+                }
+            } else {
+                if (users.find(u => u.username === username)) {
+                    alert('Ce nom d\'utilisateur existe déjà !');
+                    return;
+                }
+                
+                const newUser = {
+                    id: Date.now(),
+                    username,
+                    password,
+                    points: 0,
+                    level: 1,
+                    gamesPlayed: {}
+                };
+                
+                users.push(newUser);
+                localStorage.setItem('gameZoneUsers', JSON.stringify(users));
+                alert('Inscription réussie ! Connecte-toi maintenant.');
+                toggleMode();
+            }
+        });
+    </script>
+</body>
+</html>
