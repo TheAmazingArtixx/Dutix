@@ -12,34 +12,62 @@
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f8f9fa;
             min-height: 100vh;
         }
         .navbar {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            background: white;
             padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         .navbar h1 {
-            color: white;
+            color: #667eea;
             font-size: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
-        .navbar a {
-            color: white;
+        .navbar-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .navbar a, .navbar button {
+            color: #333;
             text-decoration: none;
-            margin-left: 1.5rem;
-            padding: 0.5rem 1.5rem;
-            border-radius: 25px;
+            padding: 0.7rem 1.5rem;
+            border-radius: 10px;
             transition: all 0.3s;
-            background: rgba(255, 255, 255, 0.2);
+            background: #f0f0f0;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
         }
-        .navbar a:hover {
-            background: rgba(255, 255, 255, 0.3);
+        .navbar a:hover, .navbar button:hover {
+            background: #667eea;
+            color: white;
             transform: translateY(-2px);
+        }
+        .navbar a.active {
+            background: #667eea;
+            color: white;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .stat-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
         }
         .container {
             max-width: 1200px;
@@ -48,61 +76,82 @@
         }
         .hero {
             text-align: center;
-            color: white;
+            color: #333;
             margin-bottom: 4rem;
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .hero h2 {
             font-size: 3.5rem;
             margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            color: #667eea;
+            font-weight: 900;
         }
         .hero p {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             margin-bottom: 2rem;
-            opacity: 0.9;
+            color: #666;
         }
         .cta-button {
             display: inline-block;
-            padding: 1rem 3rem;
-            background: white;
-            color: #667eea;
+            padding: 1.2rem 3rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             text-decoration: none;
             border-radius: 50px;
             font-weight: bold;
             font-size: 1.2rem;
             transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
         .cta-button:hover {
             transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
         }
         .games-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 2rem;
             margin-top: 3rem;
         }
         .game-card {
             background: white;
             border-radius: 20px;
-            padding: 2rem;
+            padding: 2.5rem;
             text-align: center;
             transition: all 0.3s;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            animation: slideUp 0.6s ease-out;
+            animation-fill-mode: both;
+        }
+        .game-card:nth-child(1) { animation-delay: 0.1s; }
+        .game-card:nth-child(2) { animation-delay: 0.2s; }
+        .game-card:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .game-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
         }
         .game-icon {
             font-size: 5rem;
             margin-bottom: 1rem;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
         .game-card h3 {
             font-size: 1.8rem;
             color: #667eea;
             margin-bottom: 1rem;
+            font-weight: 800;
         }
         .game-card p {
             color: #666;
@@ -110,13 +159,14 @@
             line-height: 1.6;
         }
         .features {
-            margin-top: 4rem;
+            margin-top: 5rem;
             text-align: center;
         }
         .features h2 {
-            color: white;
+            color: #667eea;
             font-size: 2.5rem;
             margin-bottom: 2rem;
+            font-weight: 900;
         }
         .features-grid {
             display: grid;
@@ -124,33 +174,36 @@
             gap: 2rem;
         }
         .feature-box {
-            background: rgba(255, 255, 255, 0.9);
+            background: white;
             padding: 2rem;
             border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        .feature-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.2);
         }
         .feature-icon {
             font-size: 3rem;
             margin-bottom: 1rem;
         }
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            color: white;
+        .feature-box h3 {
+            color: #333;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
         }
-        .user-info span {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
+        .feature-box p {
+            color: #666;
+            font-size: 0.95rem;
         }
     </style>
 </head>
 <body>
     <nav class="navbar">
         <h1>🎮 GameZone</h1>
-        <div>
-            <a href="index.html">Accueil</a>
+        <div class="navbar-links">
+            <a href="index.html" class="active">Accueil</a>
             <a href="games.html" id="gamesLink">Jeux</a>
             <a href="login.html" id="authLink">Connexion</a>
             <div id="userInfo" class="user-info" style="display: none;"></div>
@@ -160,30 +213,30 @@
     <div class="container">
         <div class="hero">
             <h2>Bienvenue sur GameZone</h2>
-            <p>La meilleure plateforme de jeux en ligne pour ados</p>
-            <a href="login.html" class="cta-button" id="ctaButton">Commencer à jouer</a>
+            <p>La meilleure plateforme de jeux en ligne</p>
+            <a href="login.html" class="cta-button" id="ctaButton">Commencer à jouer 🚀</a>
         </div>
 
         <div class="games-grid">
             <div class="game-card">
                 <div class="game-icon">🧪</div>
                 <h3>Water Sort</h3>
-                <p>Trie les couleurs dans les tubes ! Un puzzle addictif qui teste ta logique et ta stratégie.</p>
+                <p>Trie les couleurs dans les tubes avec des animations d'eau réalistes ! Un puzzle relaxant et satisfaisant.</p>
             </div>
             <div class="game-card">
                 <div class="game-icon">🧱</div>
                 <h3>Block Blast</h3>
-                <p>Place les blocs stratégiquement pour faire exploser les lignes et marquer un max de points !</p>
+                <p>Glisse-dépose les blocs et fais exploser les lignes ! Animations spectaculaires garanties.</p>
             </div>
             <div class="game-card">
                 <div class="game-icon">🐍</div>
                 <h3>Snake Pro</h3>
-                <p>Le classique Snake revisité avec des power-ups et des défis pour plus de fun !</p>
+                <p>Le serpent revisité avec un design moderne et une difficulté équilibrée. Fun et addictif !</p>
             </div>
         </div>
 
         <div class="features">
-            <h2>Fonctionnalités</h2>
+            <h2>Pourquoi GameZone ?</h2>
             <div class="features-grid">
                 <div class="feature-box">
                     <div class="feature-icon">🏆</div>
@@ -193,42 +246,45 @@
                 <div class="feature-box">
                     <div class="feature-icon">⭐</div>
                     <h3>Progression sauvegardée</h3>
-                    <p>Tes scores sont enregistrés avec Supabase</p>
+                    <p>Tes scores sont automatiquement enregistrés</p>
                 </div>
                 <div class="feature-box">
                     <div class="feature-icon">🎯</div>
                     <h3>Jeux variés</h3>
-                    <p>Différents types de défis pour ne jamais s'ennuyer</p>
+                    <p>Différents types de défis pour tous les goûts</p>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Vérifier si l'utilisateur est connecté
+        const SUPABASE_URL = 'https://fvtchcjegthrssrdvkhl.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ2dGNoY2plZ3RocnNzcmR2a2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5NDczMTEsImV4cCI6MjA4MTUyMzMxMX0.srVeg-f7-smeSKbjk-U2kZOcVHrYe7mRkU-GSlsq3wg';
+        
         const user = JSON.parse(localStorage.getItem('gameZoneUser') || 'null');
         
         if (user) {
             document.getElementById('authLink').textContent = 'Déconnexion';
             document.getElementById('authLink').href = '#';
-            document.getElementById('authLink').onclick = () => {
+            document.getElementById('authLink').onclick = (e) => {
+                e.preventDefault();
                 localStorage.removeItem('gameZoneUser');
                 location.reload();
             };
             document.getElementById('ctaButton').href = 'games.html';
-            document.getElementById('ctaButton').textContent = 'Jouer maintenant';
+            document.getElementById('ctaButton').textContent = 'Jouer maintenant 🎮';
             
             const userInfo = document.getElementById('userInfo');
             userInfo.style.display = 'flex';
             userInfo.innerHTML = `
-                <span>👤 ${user.username}</span>
-                <span>🏆 ${user.points || 0} pts</span>
-                <span>⭐ Niv. ${user.level || 1}</span>
+                <span class="stat-badge">👤 ${user.username}</span>
+                <span class="stat-badge">🏆 ${user.points || 0} pts</span>
+                <span class="stat-badge">⭐ Niv. ${user.level || 1}</span>
             `;
         } else {
             document.getElementById('gamesLink').onclick = (e) => {
                 e.preventDefault();
-                alert('Connecte-toi d\'abord pour accéder aux jeux !');
+                alert('Connecte-toi d\'abord pour accéder aux jeux ! 🎮');
                 window.location.href = 'login.html';
             };
         }
