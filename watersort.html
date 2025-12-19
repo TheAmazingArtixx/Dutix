@@ -12,27 +12,28 @@
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
             min-height: 100vh;
             padding: 2rem;
         }
         .game-container {
-            max-width: 900px;
+            max-width: 950px;
             margin: 0 auto;
         }
         .header {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 1.5rem;
-            border-radius: 15px;
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 20px;
             margin-bottom: 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
         .header h1 {
-            color: #667eea;
-            font-size: 2rem;
+            color: #1976d2;
+            font-size: 2.2rem;
+            font-weight: 900;
         }
         .header-right {
             display: flex;
@@ -40,103 +41,170 @@
             align-items: center;
         }
         .score-box {
-            background: #667eea;
+            background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
             color: white;
-            padding: 0.7rem 1.5rem;
-            border-radius: 10px;
-            font-weight: bold;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 700;
             font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(25, 118, 210, 0.3);
         }
         .btn {
-            padding: 0.7rem 1.5rem;
+            padding: 0.8rem 1.5rem;
             border: none;
-            border-radius: 10px;
-            font-weight: bold;
+            border-radius: 12px;
+            font-weight: 700;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.3s;
             font-size: 1rem;
         }
         .btn:hover {
-            transform: scale(1.05);
+            transform: translateY(-2px);
         }
         .btn-primary {
-            background: #667eea;
+            background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
             color: white;
+            box-shadow: 0 4px 15px rgba(25, 118, 210, 0.3);
         }
         .btn-secondary {
             background: #f0f0f0;
             color: #333;
         }
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
         .game-board {
-            background: rgba(255, 255, 255, 0.95);
+            background: white;
             padding: 3rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
         }
         .tubes-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+            gap: 2.5rem;
             justify-items: center;
             margin-bottom: 2rem;
         }
         .tube {
-            width: 80px;
-            height: 200px;
+            width: 90px;
+            height: 220px;
             border: 4px solid #333;
             border-top: none;
-            border-radius: 0 0 15px 15px;
-            background: rgba(255, 255, 255, 0.5);
+            border-radius: 0 0 18px 18px;
+            background: rgba(255, 255, 255, 0.8);
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
             flex-direction: column-reverse;
             padding: 5px;
             gap: 3px;
+            position: relative;
+            overflow: hidden;
+        }
+        .tube::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, 
+                rgba(255,255,255,0.3) 0%, 
+                rgba(255,255,255,0.1) 50%, 
+                rgba(255,255,255,0) 100%);
+            pointer-events: none;
+            z-index: 10;
         }
         .tube:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
         }
         .tube.selected {
             border-color: #ffd700;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: translateY(-8px) scale(1.05); }
+            50% { transform: translateY(-8px) scale(1.08); }
         }
         .water-layer {
             width: 100%;
-            height: 45px;
-            border-radius: 5px;
-            transition: all 0.3s;
+            height: 50px;
+            border-radius: 8px;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            animation: waterFlow 3s ease-in-out infinite;
+        }
+        @keyframes waterFlow {
+            0%, 100% { 
+                box-shadow: inset 0 -3px 10px rgba(0,0,0,0.2);
+            }
+            50% { 
+                box-shadow: inset 0 -6px 15px rgba(0,0,0,0.3);
+            }
+        }
+        .water-layer::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 5%;
+            width: 30%;
+            height: 40%;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            filter: blur(3px);
         }
         .controls {
             text-align: center;
-            margin-top: 2rem;
+            margin-top: 2.5rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
         }
         .win-message {
             position: fixed;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%) scale(0);
             background: white;
             padding: 3rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             text-align: center;
             display: none;
             z-index: 1000;
+            animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        }
+        @keyframes popIn {
+            to { transform: translate(-50%, -50%) scale(1); }
         }
         .win-message.show {
             display: block;
         }
         .win-message h2 {
-            color: #667eea;
-            font-size: 3rem;
+            color: #1976d2;
+            font-size: 3.5rem;
             margin-bottom: 1rem;
+            font-weight: 900;
+            animation: bounce 1s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
         .win-message p {
-            font-size: 1.3rem;
-            margin-bottom: 2rem;
-            color: #666;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            color: #333;
+            font-weight: 600;
+        }
+        .win-message .buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: center;
         }
         .overlay {
             position: fixed;
@@ -144,12 +212,21 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
             display: none;
             z-index: 999;
+            backdrop-filter: blur(5px);
         }
         .overlay.show {
             display: block;
+        }
+        .pouring-animation {
+            animation: pour 0.8s ease-out;
+        }
+        @keyframes pour {
+            0% { transform: translateY(-100px); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(0); opacity: 1; }
         }
     </style>
 </head>
@@ -176,13 +253,18 @@
     <div class="overlay" id="overlay"></div>
     <div class="win-message" id="winMessage">
         <h2>🎉 Bravo !</h2>
-        <p>Tu as terminé en <span id="finalMoves"></span> coups !</p>
-        <p>+<span id="pointsEarned"></span> points gagnés</p>
-        <button class="btn btn-primary" onclick="resetGame()">Rejouer</button>
-        <button class="btn btn-secondary" onclick="window.location.href='games.html'">Menu</button>
+        <p>Terminé en <span id="finalMoves"></span> coups !</p>
+        <p style="color: #4caf50; font-size: 2rem;">+<span id="pointsEarned"></span> points 🏆</p>
+        <div class="buttons">
+            <button class="btn btn-primary" onclick="resetGame()">Rejouer</button>
+            <button class="btn btn-secondary" onclick="window.location.href='games.html'">Menu</button>
+        </div>
     </div>
 
     <script>
+        const SUPABASE_URL = 'https://fvtchcjegthrssrdvkhl.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ2dGNoY2plZ3RocnNzcmR2a2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5NDczMTEsImV4cCI6MjA4MTUyMzMxMX0.srVeg-f7-smeSKbjk-U2kZOcVHrYe7mRkU-GSlsq3wg';
+        
         let tubes = [];
         let selectedTube = null;
         let moves = 0;
@@ -197,12 +279,10 @@
             history = [];
             selectedTube = null;
             
-            // Créer 7 tubes (5 avec couleurs, 2 vides)
             for (let i = 0; i < 7; i++) {
                 tubes.push([]);
             }
             
-            // Remplir avec couleurs mélangées
             let allColors = [];
             colors.forEach(color => {
                 for (let i = 0; i < 4; i++) {
@@ -210,10 +290,8 @@
                 }
             });
             
-            // Mélanger
             allColors.sort(() => Math.random() - 0.5);
             
-            // Distribuer dans les 5 premiers tubes
             for (let i = 0; i < 5; i++) {
                 for (let j = 0; j < 4; j++) {
                     tubes[i].push(allColors[i * 4 + j]);
@@ -238,10 +316,11 @@
                 }
                 tubeEl.onclick = () => selectTube(index);
                 
-                tube.forEach(color => {
+                tube.forEach((color, layerIndex) => {
                     const layer = document.createElement('div');
                     layer.className = 'water-layer';
                     layer.style.backgroundColor = color;
+                    layer.style.animationDelay = `${layerIndex * 0.1}s`;
                     tubeEl.appendChild(layer);
                 });
                 
@@ -269,13 +348,7 @@
             const fromTube = tubes[from];
             const toTube = tubes[to];
             
-            if (fromTube.length === 0) {
-                selectedTube = null;
-                updateDisplay();
-                return;
-            }
-            
-            if (toTube.length >= 4) {
+            if (fromTube.length === 0 || toTube.length >= 4) {
                 selectedTube = null;
                 updateDisplay();
                 return;
@@ -289,14 +362,20 @@
                 return;
             }
             
-            // Sauvegarder pour undo
             history.push(JSON.parse(JSON.stringify(tubes)));
             
-            // Verser autant que possible
+            const container = document.getElementById('tubesContainer');
+            const toTubeEl = container.children[to];
+            
             while (fromTube.length > 0 && 
                    toTube.length < 4 && 
                    fromTube[fromTube.length - 1] === topColor &&
                    (toTube.length === 0 || toTube[toTube.length - 1] === topColor)) {
+                const layer = document.createElement('div');
+                layer.className = 'water-layer pouring-animation';
+                layer.style.backgroundColor = topColor;
+                toTubeEl.appendChild(layer);
+                
                 toTube.push(fromTube.pop());
             }
             
@@ -304,8 +383,10 @@
             score += 10;
             selectedTube = null;
             
-            updateDisplay();
-            checkWin();
+            setTimeout(() => {
+                updateDisplay();
+                checkWin();
+            }, 400);
         }
 
         function undoMove() {
@@ -327,10 +408,8 @@
                     if (tube.every(c => c === firstColor)) {
                         completed++;
                     }
-                } else if (tube.length === 0) {
-                    // Tube vide ok
-                } else {
-                    return; // Pas gagné
+                } else if (tube.length !== 0) {
+                    return;
                 }
             }
             
@@ -346,7 +425,6 @@
             document.getElementById('overlay').classList.add('show');
             document.getElementById('winMessage').classList.add('show');
             
-            // Mettre à jour la progression
             updateProgress('watersort', pointsEarned);
         }
 
@@ -373,7 +451,6 @@
             
             localStorage.setItem('gameZoneUser', JSON.stringify(user));
             
-            // Mettre à jour dans la liste des utilisateurs
             const users = JSON.parse(localStorage.getItem('gameZoneUsers') || '[]');
             const userIndex = users.findIndex(u => u.id === user.id);
             if (userIndex !== -1) {
@@ -382,10 +459,9 @@
             }
         }
 
-        // Vérifier connexion
         const user = JSON.parse(localStorage.getItem('gameZoneUser'));
         if (!user) {
-            alert('Connecte-toi d\'abord !');
+            alert('Connecte-toi d\'abord ! 🔐');
             window.location.href = 'login.html';
         } else {
             initGame();
